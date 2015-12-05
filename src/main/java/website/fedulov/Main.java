@@ -1,6 +1,8 @@
-package website.fedulov.aspect;
+package website.fedulov;
 
 import org.springframework.transaction.annotation.Transactional;
+import website.fedulov.aspect.ReadOnlyConnection;
+import website.fedulov.aspect.WriteConnection;
 import website.fedulov.routing.DbContextHolder;
 import website.fedulov.testmodel.SomeData;
 import website.fedulov.testrepo.SomeDataRepository;
