@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+			http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+			http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+			">
+
+    <!-- Drives transactions using local JPA APIs -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory" />
+    </bean>
+
+    <!-- Creates a EntityManagerFactory for use with the Hibernate JPA provider and a simple in-memory data source populated with test data -->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+        </property>
+    </bean>
+
+    <bean id="dataSource" class="website.fedulov.routing.RoutingDataSource">
+        <property name="targetDataSources">
+            <map key-type="website.fedulov.routing.DbType">
+                <entry key="MASTER" value-ref="dataSourceMasterEmbedded"/>
+                <entry key="REPLICA1" value-ref="dataSourceReplicaEmbedded"/>
+            </map>
+        </property>
+        <property name="defaultTargetDataSource" ref="dataSourceMaster"/>
+    </bean>
+
+
+    <jdbc:embedded-database id="dataSourceMasterEmbedded" type="HSQL">
+   		<jdbc:script location="classpath:db/create-table.sql" />
+   		<jdbc:script location="classpath:db/insert-data-master.sql" />
+   	</jdbc:embedded-database>
+
+    <jdbc:embedded-database id="dataSourceReplicaEmbedded" type="HSQL">
+   		<jdbc:script location="classpath:db/create-table.sql" />
+   		<jdbc:script location="classpath:db/insert-data-replica.sql" />
+   	</jdbc:embedded-database>
+
+    <bean id="dataSourceMaster"
+          class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="${db.master.url}" />
+        <property name="username" value="${db.username}" />
+        <property name="password" value="${db.password}" />
+        <property name="validationQuery" value="SELECT 1"></property>
+        <property name="testOnBorrow" value="true"></property>
+    </bean>
+
+    <bean id="dataSourceReplica"
+          class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="${db.replica.url}" />
+        <property name="username" value="${db.username}" />
+        <property name="password" value="${db.password}" />
+        <property name="validationQuery" value="SELECT 1"></property>
+        <property name="testOnBorrow" value="true"></property>
+    </bean>
+
+    <jpa:repositories base-package="com.sabienzia.idp.repositories"/>
+</beans>

@@ -1,0 +1,1 @@
+INSERT INTO some_table VALUES (1, 'name', 'master');
