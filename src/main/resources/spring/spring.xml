@@ -15,7 +15,7 @@
     <!-- Import configs -->
     <import resource="data.xml" />
 
-    <context:component-scan base-package="website.fedulov.aspect, website.fedulov.testmodel, website.fedulov.testrepo" />
+    <context:component-scan base-package="website.fedulov.aspect, website.fedulov.testmodel, website.fedulov.testrepo, website.fedulov" />
 
     <jpa:repositories base-package="website.fedulov.testrepo"/>
 
